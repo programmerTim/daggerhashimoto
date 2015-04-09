@@ -6,7 +6,7 @@
 #include <time.h>
 #include <libethash/ethash.h>
 
-class ethash_cl_miner
+class ethash_cl_miner_base
 {
 public:
 	struct search_hook
@@ -16,6 +16,17 @@ public:
 		virtual bool searched(uint64_t start_nonce, uint32_t count) = 0;
 	};
 
+	virtual ~ethash_cl_miner_base() {}
+
+	virtual bool init(ethash_params const& params, const uint8_t seed[32], unsigned workgroup_size = 64) = 0;
+
+	virtual void finish() = 0;
+	virtual void hash(uint8_t* ret, uint8_t const* header, uint64_t nonce, unsigned count) = 0;
+	virtual void search(uint8_t const* header, uint64_t target, search_hook& hook) = 0;
+};
+
+class ethash_cl_miner : public ethash_cl_miner_base
+{
 public:
 	ethash_cl_miner();
 

@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 2.8)
+
 set(LIBRARY ethash-cl)
 set(CMAKE_BUILD_TYPE Release)
 
@@ -5,7 +7,10 @@ include(bin2h.cmake)
 bin2h(SOURCE_FILE ethash_cl_miner_kernel.cl
       VARIABLE_NAME ethash_cl_miner_kernel
       HEADER_FILE ${CMAKE_CURRENT_BINARY_DIR}/ethash_cl_miner_kernel.h)
-
+bin2h(SOURCE_FILE ethash_cl_miner2_kernel.cl
+      VARIABLE_NAME ethash_cl_miner2_kernel
+      HEADER_FILE ${CMAKE_CURRENT_BINARY_DIR}/ethash_cl_miner2_kernel.h)
+      
 if (NOT MSVC)
 	# Initialize CXXFLAGS for c++11
     set(CMAKE_CXX_FLAGS                "-Wall -std=c++11")
@@ -35,6 +40,6 @@ endif()
 if (OpenCL_FOUND)
 	include_directories(${OpenCL_INCLUDE_DIRS} ${CMAKE_CURRENT_BINARY_DIR})
 	include_directories(..)
-	add_library(${LIBRARY} ethash_cl_miner.cpp ethash_cl_miner.h cl.hpp)
+	add_library(${LIBRARY} ethash_cl_miner.cpp ethash_cl_miner.h ethash_cl_miner2.cpp ethash_cl_miner2.h cl.hpp)
 	TARGET_LINK_LIBRARIES(${LIBRARY} ${OpenCL_LIBRARIES} ethash)
 endif()

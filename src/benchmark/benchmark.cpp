@@ -26,6 +26,7 @@
 #include <libethash/util.h>
 #ifdef OPENCL
 #include <libethash-cl/ethash_cl_miner.h>
+#include <libethash-cl/ethash_cl_miner2.h>
 #endif
 #include <vector>
 #include <algorithm>
@@ -96,8 +97,18 @@ static std::string bytesToHexString(uint8_t const* bytes, unsigned size)
 	return str;
 }
 
-extern "C" int main(void)
+extern "C" int main(int argc, char const* argv[])
 {
+	// half baked lazy options parser
+	unsigned kernel = 1;
+	for (unsigned i = 0; i != argc; ++i)
+	{
+		if (strcmp(argv[i], "--kernel2") == 0)
+		{
+			kernel = 2;
+		}
+	}
+
 	// params for ethash
 	ethash_params params;
 	ethash_params_init(&params, 0);
@@ -150,7 +161,8 @@ extern "C" int main(void)
 	}
 
 #ifdef OPENCL
-	ethash_cl_miner miner;
+	ethash_cl_miner_base& miner = *(kernel == 2 ? (ethash_cl_miner_base*)new ethash_cl_miner2() : new ethash_cl_miner());
+
 	{
 		auto startTime = high_resolution_clock::now();
 		if (!miner.init(params, seed))
@@ -266,6 +278,9 @@ extern "C" int main(void)
 	free(cache_mem_buf);
 #ifdef FULL
 	free(full_mem_buf);
+#endif
+#ifdef OPENCL
+	delete &miner;
 #endif
 
 	return 0;
