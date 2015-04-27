@@ -217,8 +217,12 @@ void ethash_cl_miner2::hash(uint8_t* ret, uint8_t const* header, uint64_t start_
 
 			cl::Event init_event, inner_event;
 			m_hash_queue.enqueueNDRangeKernel(m_init_kernel, cl::NullRange, batch_count, m_workgroup_size, NULL, &init_event);
-			m_mem_queue.enqueueNDRangeKernel(m_inner_kernel, cl::NullRange, batch_count, m_workgroup_size, &std::vector<cl::Event>{init_event}, &inner_event);
-			m_hash_queue.enqueueNDRangeKernel(m_hash_kernel, cl::NullRange, batch_count, m_workgroup_size, &std::vector<cl::Event>{inner_event});
+
+			std::vector<cl::Event> init_event_vec = std::vector<cl::Event>{init_event};
+			m_mem_queue.enqueueNDRangeKernel(m_inner_kernel, cl::NullRange, batch_count, m_workgroup_size, &init_event_vec, &inner_event);
+
+			std::vector<cl::Event> inner_event_vec = std::vector<cl::Event>{inner_event};
+			m_hash_queue.enqueueNDRangeKernel(m_hash_kernel, cl::NullRange, batch_count, m_workgroup_size, &inner_event_vec);
 
 			pending.push({i, this_count, buf});
 			i += this_count;
@@ -308,8 +312,12 @@ void ethash_cl_miner2::search(uint8_t const* header, uint64_t target, search_hoo
 		// execute it!
 		cl::Event init_event, inner_event;
 		m_hash_queue.enqueueNDRangeKernel(m_init_kernel, cl::NullRange, c_search_batch_size, m_workgroup_size, NULL, &init_event);
-		m_mem_queue.enqueueNDRangeKernel(m_inner_kernel, cl::NullRange, c_search_batch_size, m_workgroup_size, &std::vector<cl::Event>{init_event}, &inner_event);
-		m_hash_queue.enqueueNDRangeKernel(m_search_kernel, cl::NullRange, c_search_batch_size, m_workgroup_size, &std::vector<cl::Event>{inner_event});
+
+		std::vector<cl::Event> init_event_vec = std::vector<cl::Event>{init_event};
+		m_mem_queue.enqueueNDRangeKernel(m_inner_kernel, cl::NullRange, c_search_batch_size, m_workgroup_size, &init_event_vec, &inner_event);
+
+		std::vector<cl::Event> inner_event_vec = std::vector<cl::Event>{inner_event};
+		m_hash_queue.enqueueNDRangeKernel(m_search_kernel, cl::NullRange, c_search_batch_size, m_workgroup_size, &inner_event_vec);
 
 		pending.push({start_nonce, buf});
 		buf = (buf + 1) % c_num_buffers;
