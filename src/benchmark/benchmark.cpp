@@ -114,9 +114,9 @@ extern "C" int main(int argc, char const* argv[])
 	ethash_params_init(&params, 0);
 	//params.full_size = 262147 * 4096;	// 1GBish;
 	//params.full_size = 32771 * 4096;	// 128MBish;
-	//params.full_size = 8209 * 4096;	// 8MBish;
+	params.full_size = 8209 * 4096;	// 8MBish;
 	//params.cache_size = 8209*4096;
-	//params.cache_size = 2053*4096;
+	params.cache_size = 2053*4096;
 	uint8_t seed[32], previous_hash[32];
 
 	memcpy(seed, hexStringToBytes("9410b944535a83d9adf6bbdcc80e051f30676173c16ca0d32d6f1263fc246466").data(), 32);
