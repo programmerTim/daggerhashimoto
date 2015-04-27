@@ -20,7 +20,9 @@ set(FILES 	util.c
           	data_sizes.h)
 
 if (NOT CRYPTOPP_FOUND)
-	find_package(CryptoPP 5.6.2)
+	if (WANT_CRYPTOPP)
+		find_package(CryptoPP 5.6.2)
+	endif()
 endif()
 
 if (CRYPTOPP_FOUND)

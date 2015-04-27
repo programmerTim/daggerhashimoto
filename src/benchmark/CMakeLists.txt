@@ -20,7 +20,9 @@ if (NOT CRYPTOPP_FOUND)
 endif()
 
 if (CRYPTOPP_FOUND)
-	add_definitions(-DWITH_CRYPTOPP)
+	if (WANT_CRYPTOPP)
+		add_definitions(-DWITH_CRYPTOPP)
+	endif()
 endif()
 
 if (NOT OpenCL_FOUND)
